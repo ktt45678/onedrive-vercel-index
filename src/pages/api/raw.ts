@@ -42,7 +42,7 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
   const cleanPath = pathPosix.resolve('/', pathPosix.normalize(path))
 
   // Handle protected routes authentication
-  const odTokenHeader = (req.headers['od-protected-token'] as string) ?? odpt
+  //const odTokenHeader = (req.headers['od-protected-token'] as string) ?? odpt
 
   const accessToken = await getAccessToken()
   if (!accessToken) {
@@ -50,6 +50,7 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
     return
   }
 
+  /*
   const { code, message } = await checkAuthRoute(cleanPath, accessToken, odTokenHeader)
   // Status code other than 200 means user has not authenticated yet
   if (code !== 200) {
@@ -61,6 +62,9 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
   if (message !== '') {
     res.setHeader('Cache-Control', 'no-cache')
   }
+  */
+
+  res.setHeader('Cache-Control', cacheControlHeader);
 
   await runCorsMiddleware(req, res)
   try {
