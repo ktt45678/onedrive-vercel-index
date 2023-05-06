@@ -22,14 +22,13 @@ export function runCorsMiddleware(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const accessToken = await getAccessToken()
-  if (!accessToken) {
-    res.status(403).json({ error: 'No access token.' })
-    return
-  }
 
   const { path = '/', odpt = '', proxy = false } = req.query
 
+  return handlePath(req, res, path, odpt, proxy);
+}
+
+export async function handlePath(req: NextApiRequest, res: NextApiResponse, path: string | string[] = '/', odpt: string | string[] = '', proxy: boolean | string | string[] = false) {
   // Sometimes the path parameter is defaulted to '[...path]' which we need to handle
   if (path === '[...path]') {
     res.status(400).json({ error: 'No path specified.' })
@@ -44,6 +43,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Handle protected routes authentication
   const odTokenHeader = (req.headers['od-protected-token'] as string) ?? odpt
+
+  const accessToken = await getAccessToken()
+  if (!accessToken) {
+    res.status(403).json({ error: 'No access token.' })
+    return
+  }
 
   const { code, message } = await checkAuthRoute(cleanPath, accessToken, odTokenHeader)
   // Status code other than 200 means user has not authenticated yet
