@@ -30,5 +30,6 @@ module.exports = {
   // - s-maxage=0: cache is fresh for 60 seconds on the edge, after which it becomes stale
   // - stale-while-revalidate: allow serving stale content while revalidating on the edge
   // https://vercel.com/docs/concepts/edge-network/caching
-  cacheControlHeader: 'max-age=1200, s-maxage=60, stale-while-revalidate',
+  cacheControlHeader: 'max-age=120, s-maxage=60, stale-while-revalidate',
+  redirectCacheControlHeader: 'max-age=1500, s-maxage=1500, must-revalidate',
 }

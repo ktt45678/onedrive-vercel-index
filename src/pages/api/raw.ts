@@ -4,8 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import axios, { AxiosResponseHeaders } from 'axios'
 import Cors from 'cors'
 
-import { driveApi, cacheControlHeader } from '../../../config/api.config'
-import { encodePath, getAccessToken, checkAuthRoute } from '.'
+import { driveApi, cacheControlHeader, redirectCacheControlHeader } from '../../../config/api.config'
+import { encodePath, getAccessToken, /*checkAuthRoute*/ } from '.'
 
 // CORS middleware for raw links: https://nextjs.org/docs/api-routes/api-middlewares
 export function runCorsMiddleware(req: NextApiRequest, res: NextApiResponse) {
@@ -64,7 +64,7 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
   }
   */
 
-  res.setHeader('Cache-Control', cacheControlHeader);
+  res.setHeader('Cache-Control', redirectCacheControlHeader);
 
   await runCorsMiddleware(req, res)
   try {
@@ -89,7 +89,7 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
         res.writeHead(200, headers as AxiosResponseHeaders)
         stream.pipe(res)
       } else {
-        res.redirect(data['@microsoft.graph.downloadUrl'])
+        res.redirect(308, data['@microsoft.graph.downloadUrl'])
       }
     } else {
       res.status(404).json({ error: 'No download url found.' })
