@@ -89,7 +89,7 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
         res.writeHead(200, headers as AxiosResponseHeaders)
         stream.pipe(res)
       } else {
-        res.redirect(308, data['@microsoft.graph.downloadUrl'])
+        res.redirect(301, data['@microsoft.graph.downloadUrl'])
       }
     } else {
       res.status(404).json({ error: 'No download url found.' })
