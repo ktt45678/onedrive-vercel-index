@@ -23,12 +23,12 @@ export function runCorsMiddleware(req: NextApiRequest, res: NextApiResponse) {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const { path = '/', odpt = '', proxy = false } = req.query
+  const { path = '/', odpt = '', proxy = false, redirect = '308' } = req.query
 
-  return handlePath(req, res, path, odpt, proxy);
+  return handlePath(req, res, path, odpt, proxy, +redirect);
 }
 
-export async function handlePath(req: NextApiRequest, res: NextApiResponse, path: string | string[] = '/', odpt: string | string[] = '', proxy: boolean | string | string[] = false) {
+export async function handlePath(req: NextApiRequest, res: NextApiResponse, path: string | string[] = '/', odpt: string | string[] = '', proxy: boolean | string | string[] = false, redirect: number = 308) {
   // Sometimes the path parameter is defaulted to '[...path]' which we need to handle
   if (path === '[...path]') {
     res.status(400).json({ error: 'No path specified.' })
@@ -89,7 +89,8 @@ export async function handlePath(req: NextApiRequest, res: NextApiResponse, path
         res.writeHead(200, headers as AxiosResponseHeaders)
         stream.pipe(res)
       } else {
-        res.redirect(301, data['@microsoft.graph.downloadUrl'])
+        const statusCode = redirect >= 300 && redirect <= 308 ? redirect : 308;
+        res.redirect(statusCode, data['@microsoft.graph.downloadUrl'])
       }
     } else {
       res.status(404).json({ error: 'No download url found.' })
